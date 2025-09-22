@@ -1,5 +1,5 @@
-# Netlify Configuration for GRL Platform
-# Genesis Reloop Logistics - Phase 5 REOP Integration
+# Netlify Configuration for GSWX Genesis Reloop Platform
+# S-W-RLE-OS Target Profiling System with REOP Framework Integration
 
 [build]
   # Build command
@@ -45,28 +45,6 @@
   from = "/*"
   to = "/index.html"
   status = 200
-  conditions = { Role = ["admin", "user"] }
-
-[[redirects]]
-  # API proxy to prevent CORS issues (if using external APIs)
-  from = "/api/*"
-  to = "https://your-api-domain.com/api/:splat"
-  status = 200
-  force = false
-
-[[redirects]]
-  # REOP API endpoints proxy
-  from = "/reop/*"
-  to = "https://your-reop-api.com/reop/:splat"
-  status = 200
-  headers = { X-From = "Netlify" }
-
-[[redirects]]
-  # Supabase proxy for enhanced security
-  from = "/supabase/*"
-  to = "https://your-project.supabase.co/:splat"
-  status = 200
-  headers = { X-Forwarded-Host = "grl-platform.netlify.app" }
 
 # ==========================================
 # HEADERS
@@ -83,7 +61,7 @@
       style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
       font-src 'self' https://fonts.gstatic.com;
       img-src 'self' data: https: blob:;
-      connect-src 'self' https://your-project.supabase.co https://openrouter.ai wss://your-project.supabase.co;
+      connect-src 'self' https://*.supabase.co https://openrouter.ai wss://*.supabase.co;
       media-src 'self';
       object-src 'none';
       frame-src 'none';
@@ -172,13 +150,6 @@
   package = "@netlify/plugin-essential-next-js"
 
 [[plugins]]
-  # Lighthouse CI for performance monitoring
-  package = "netlify-plugin-lighthouse"
-  
-  [plugins.inputs]
-    output_path = "reports/lighthouse"
-
-[[plugins]]
   # Bundle analyzer
   package = "netlify-plugin-bundle-stats"
   
@@ -204,56 +175,6 @@
   enabled = true
 
 # ==========================================
-# SPLIT TESTING
-# ==========================================
-
-# A/B testing configuration for REOP features
-[[split_tests]]
-  path = "/dashboard"
-  branches = [
-    { branch = "main", split = 90 },
-    { branch = "reop-enhanced", split = 10 }
-  ]
-
-# ==========================================
-# CUSTOM BUILD SETTINGS
-# ==========================================
-
-# Pre-build commands
-[build.command]
-  # Install dependencies and run REOP validation
-  value = """
-    npm ci &&
-    npm run lint &&
-    npm run test:ci &&
-    npm run validate:reop &&
-    npm run build
-  """
-
-# Post-build commands
-[[build.processing.skip_processing]]
-  # Skip processing for specific files
-  paths = [
-    "/reop-config.json",
-    "/coherence-data/*.json",
-    "/consciousness-objects/*.json"
-  ]
-
-# ==========================================
-# EDGE FUNCTIONS
-# ==========================================
-
-[[edge_functions]]
-  # REOP coherence validation at the edge
-  function = "reop-coherence-validator"
-  path = "/api/reop/*"
-
-[[edge_functions]]
-  # Real-time coherence monitoring
-  function = "coherence-monitor"
-  path = "/dashboard/monitoring"
-
-# ==========================================
 # CUSTOM RULES
 # ==========================================
 
@@ -267,34 +188,3 @@
   path = "/reop/probability-navigation/*"
   headers = { X-REOP-Navigation-Type = "probability" }
   status = 200
-
-# ==========================================
-# MONITORING & ALERTS
-# ==========================================
-
-# Performance monitoring
-[monitoring]
-  # Core Web Vitals monitoring
-  enabled = true
-  
-  # REOP-specific monitoring
-  [monitoring.reop]
-    coherence_threshold = 0.7
-    alert_on_drop = true
-    notification_email = "admin@grl-platform.com"
-
-# ==========================================
-# DEPLOYMENT NOTIFICATIONS
-# ==========================================
-
-[notifications]
-  # Deployment success/failure notifications
-  [notifications.email]
-    recipients = ["admin@grl-platform.com"]
-    events = ["deploy-succeeded", "deploy-failed", "deploy-locked"]
-  
-  # REOP-specific notifications
-  [notifications.reop]
-    coherence_alerts = true
-    consciousness_object_alerts = true
-    system_stability_alerts = true
