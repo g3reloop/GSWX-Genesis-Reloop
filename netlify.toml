@@ -1,0 +1,300 @@
+# Netlify Configuration for GRL Platform
+# Genesis Reloop Logistics - Phase 5 REOP Integration
+
+[build]
+  # Build command
+  command = "npm run build"
+  
+  # Directory to publish (build output)
+  publish = "build"
+  
+  # Base directory for build
+  base = "."
+  
+  # Environment variables for build
+  environment = { NODE_VERSION = "18", NPM_VERSION = "9" }
+
+[build.processing]
+  # Skip processing for faster deploys
+  skip_processing = false
+
+[build.processing.css]
+  # CSS minification
+  bundle = true
+  minify = true
+
+[build.processing.js]
+  # JavaScript minification
+  bundle = true
+  minify = true
+
+[build.processing.html]
+  # HTML minification
+  pretty_urls = true
+
+[build.processing.images]
+  # Image optimization
+  compress = true
+
+# ==========================================
+# REDIRECTS & REWRITES
+# ==========================================
+
+[[redirects]]
+  # SPA routing - redirect all routes to index.html
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  conditions = { Role = ["admin", "user"] }
+
+[[redirects]]
+  # API proxy to prevent CORS issues (if using external APIs)
+  from = "/api/*"
+  to = "https://your-api-domain.com/api/:splat"
+  status = 200
+  force = false
+
+[[redirects]]
+  # REOP API endpoints proxy
+  from = "/reop/*"
+  to = "https://your-reop-api.com/reop/:splat"
+  status = 200
+  headers = { X-From = "Netlify" }
+
+[[redirects]]
+  # Supabase proxy for enhanced security
+  from = "/supabase/*"
+  to = "https://your-project.supabase.co/:splat"
+  status = 200
+  headers = { X-Forwarded-Host = "grl-platform.netlify.app" }
+
+# ==========================================
+# HEADERS
+# ==========================================
+
+[[headers]]
+  # Security headers for all pages
+  for = "/*"
+  [headers.values]
+    # Content Security Policy for REOP integration
+    Content-Security-Policy = '''
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://openrouter.ai;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      font-src 'self' https://fonts.gstatic.com;
+      img-src 'self' data: https: blob:;
+      connect-src 'self' https://your-project.supabase.co https://openrouter.ai wss://your-project.supabase.co;
+      media-src 'self';
+      object-src 'none';
+      frame-src 'none';
+      base-uri 'self';
+      form-action 'self';
+    '''
+    
+    # REOP-specific security headers
+    X-REOP-Version = "5.0.0"
+    X-Coherence-Threshold = "0.7"
+    X-Consciousness-Enabled = "true"
+    
+    # Standard security headers
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    
+    # Performance headers
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  # API-specific headers
+  for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization, X-REOP-Token"
+    X-API-Version = "5.0.0"
+
+[[headers]]
+  # Static assets caching
+  for = "/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# ==========================================
+# FUNCTIONS (Netlify Functions)
+# ==========================================
+
+[functions]
+  # Directory for serverless functions
+  directory = "netlify/functions"
+  
+  # Node.js runtime
+  node_bundler = "esbuild"
+  
+  # Environment variables for functions
+  [functions.environment]
+    NODE_ENV = "production"
+    REOP_ENABLED = "true"
+
+# ==========================================
+# ENVIRONMENT VARIABLES
+# ==========================================
+
+# Note: Actual environment variables should be set in Netlify dashboard
+# This is for reference only
+
+[context.production.environment]
+  NODE_ENV = "production"
+  REACT_APP_ENVIRONMENT = "production"
+  REACT_APP_BUILD_VERSION = "5.0.0"
+  REACT_APP_ENABLE_REOP = "true"
+  REACT_APP_ENABLE_SWI_ANALYSIS = "true"
+  REACT_APP_DEBUG_MODE = "false"
+
+[context.deploy-preview.environment]
+  NODE_ENV = "development"
+  REACT_APP_ENVIRONMENT = "preview"
+  REACT_APP_DEBUG_MODE = "true"
+  REACT_APP_ENABLE_MOCK_DATA = "true"
+
+[context.branch-deploy.environment]
+  NODE_ENV = "development"
+  REACT_APP_ENVIRONMENT = "development"
+  REACT_APP_DEBUG_MODE = "true"
+
+# ==========================================
+# PLUGINS
+# ==========================================
+
+[[plugins]]
+  # Essential Netlify plugins
+  package = "@netlify/plugin-essential-next-js"
+
+[[plugins]]
+  # Lighthouse CI for performance monitoring
+  package = "netlify-plugin-lighthouse"
+  
+  [plugins.inputs]
+    output_path = "reports/lighthouse"
+
+[[plugins]]
+  # Bundle analyzer
+  package = "netlify-plugin-bundle-stats"
+  
+  [plugins.inputs]
+    save = true
+    compare = true
+
+# ==========================================
+# FORMS (Netlify Forms)
+# ==========================================
+
+# Contact form configuration
+[forms]
+  # Enable form processing
+  enabled = true
+
+# ==========================================
+# ANALYTICS
+# ==========================================
+
+# Netlify Analytics
+[analytics]
+  enabled = true
+
+# ==========================================
+# SPLIT TESTING
+# ==========================================
+
+# A/B testing configuration for REOP features
+[[split_tests]]
+  path = "/dashboard"
+  branches = [
+    { branch = "main", split = 90 },
+    { branch = "reop-enhanced", split = 10 }
+  ]
+
+# ==========================================
+# CUSTOM BUILD SETTINGS
+# ==========================================
+
+# Pre-build commands
+[build.command]
+  # Install dependencies and run REOP validation
+  value = """
+    npm ci &&
+    npm run lint &&
+    npm run test:ci &&
+    npm run validate:reop &&
+    npm run build
+  """
+
+# Post-build commands
+[[build.processing.skip_processing]]
+  # Skip processing for specific files
+  paths = [
+    "/reop-config.json",
+    "/coherence-data/*.json",
+    "/consciousness-objects/*.json"
+  ]
+
+# ==========================================
+# EDGE FUNCTIONS
+# ==========================================
+
+[[edge_functions]]
+  # REOP coherence validation at the edge
+  function = "reop-coherence-validator"
+  path = "/api/reop/*"
+
+[[edge_functions]]
+  # Real-time coherence monitoring
+  function = "coherence-monitor"
+  path = "/dashboard/monitoring"
+
+# ==========================================
+# CUSTOM RULES
+# ==========================================
+
+# Custom routing for REOP endpoints
+[[rules]]
+  path = "/reop/consciousness-objects/*"
+  headers = { X-REOP-Object-Type = "consciousness" }
+  status = 200
+
+[[rules]]
+  path = "/reop/probability-navigation/*"
+  headers = { X-REOP-Navigation-Type = "probability" }
+  status = 200
+
+# ==========================================
+# MONITORING & ALERTS
+# ==========================================
+
+# Performance monitoring
+[monitoring]
+  # Core Web Vitals monitoring
+  enabled = true
+  
+  # REOP-specific monitoring
+  [monitoring.reop]
+    coherence_threshold = 0.7
+    alert_on_drop = true
+    notification_email = "admin@grl-platform.com"
+
+# ==========================================
+# DEPLOYMENT NOTIFICATIONS
+# ==========================================
+
+[notifications]
+  # Deployment success/failure notifications
+  [notifications.email]
+    recipients = ["admin@grl-platform.com"]
+    events = ["deploy-succeeded", "deploy-failed", "deploy-locked"]
+  
+  # REOP-specific notifications
+  [notifications.reop]
+    coherence_alerts = true
+    consciousness_object_alerts = true
+    system_stability_alerts = true

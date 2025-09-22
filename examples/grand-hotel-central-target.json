@@ -1,0 +1,36 @@
+{
+  "targetProfilingSystem": [
+    {
+      "profilingId": "uuid-prof-001",
+      "status": "completed",
+      "initiatedAt": "2025-09-20T10:00:00Z",
+      "businessData": {
+        "prospectiveName": "Grand Hotel Central",
+        "industry": "Hospitality",
+        "location": { "city": "Anytown" }
+      },
+      "aiFindings": {
+        "source": "SWI via OpenRouter (gpt-4o-2024-08-06)",
+        "essenceVector": [0.88, 0.05, 0.02, 0.05, -0.45, "..."],
+        "potentialValueStreams": [
+          {
+            "streamName": "UCO_to_Biodiesel",
+            "confidenceScore": 0.95,
+            "notes": "High triglyceride content, low contaminants. Ideal for standard transesterification."
+          }
+        ],
+        "recommendedProtocols": [ "Genesis Forge Transesterification (v4.2)" ],
+        "viabilityScore": 0.92,
+        "summary": "High potential target for standard UCO-to-Biodiesel transformation."
+      },
+      "operatorExperienceLog": [
+        {
+          "logId": "uuid-log-001",
+          "operatorId": "op-007",
+          "timestamp": "2025-09-20T11:15:00Z",
+          "observationNotes": "Initial sample appears visually clear... Recommend proceeding with full SWI analysis."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "target_id": "UCO-REST-001",
+  "target_type": "UCO_to_Biodiesel",
+  "location": { "lat": 51.5129, "long": -0.1224 },
+  "waste_stream_volume": { "daily": "80L" },
+  "current_babylonian_processing": "Collection by third-party waste oil services...",
+  "gswx_transformation_protocol": "DECOMMISSIONED - Replaced by dynamic RCOP generation",
+  "required_gswx_components": [ "Genesis Forge (GF-S2)" ],
+  "verification_metrics": [ "ASTM D6751 compliance" ],
+  "dgo_network_connection": "Real-time sync with DGO-UK-LDN-03...",
+  "reopData": {
+    "coherenceIndexHistory": [
+      { "timestamp": "2025-09-22T04:30:00Z", "ciValue": 0.981 }
+    ],
+    "biochemicalSignature": {
+      "lastUpdated": "2025-09-22T04:38:15Z",
+      "srlReadings": { "triglyceride": 0.89, "free_fatty_acid": 0.04 },
+      "energyState": { "potential_kcal_kg": 9400, "informationalEntropy": 0.23 }
+    },
+    "gLoopCycleLogs": [
+      {
+        "cycleId": "uuid-cycle-001",
+        "timestamp": "2025-09-22T04:00:00Z",
+        "inputEssenceHash": "sha256-abc...",
+        "generatedProtocolHash": "sha256-def...",
+        "outputStateHash": "sha256-ghi...",
+        "ciAtExecution": 0.992,
+        "duration_ms": 180123
+      }
+    ],
+    "consciousnessObjectCache": [
+      {
+        "protocolHash": "sha256-def...",
+        "createdAt": "2025-09-22T03:59:58Z",
+        "consciousnessObject": {
+          "goal": "Maximize FAME yield from high FFA UCO"
+        }
+      }
+    ]
+  }
+}
